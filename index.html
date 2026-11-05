@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yohゼミの活動報告</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; overflow: hidden; font-family: "Hiragino Sans", "Meiryo", sans-serif; color: #fff; }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    justify-content: center; align-items: center;
+    text-align: center; padding: 0 5vw;
+    overflow: hidden;
+    opacity: 0; transform: translateX(100%);
+    transition: opacity .8s, transform .8s;
+  }
+  .slide.active { opacity: 1; transform: translateX(0); }
+  .slide.prev   { transform: translateX(-100%); }
+
+  /* 背景写真(ゆっくりズーム) */
+  .slide::before {
+    content: ""; position: absolute; inset: 0; z-index: -1;
+    background-size: cover; background-position: center;
+  }
+  .slide.active::before { animation: zoom 12s linear forwards; }
+  @keyframes zoom {
+    from { transform: scale(1); }
+    to   { transform: scale(1.12); }
+  }
+
+  /* スライドごとの背景(写真は暗くして文字を読みやすく) */
+  #s1::before { background-image: linear-gradient(rgba(0,0,0,.5), rgba(0,0,0,.5)), url("photo1.jpg"); }
+  #s2::before { background-image: linear-gradient(rgba(0,0,0,.55), rgba(0,0,0,.55)), url("photo2.png"); }
+  #s3::before { background-image: linear-gradient(rgba(0,0,0,.6), rgba(0,0,0,.6)), url("photo3.jpg"); }
+
+  h1 { font-size: 7vw; font-weight: 900; }
+  h2 { font-size: 5vw; font-weight: 800; line-height: 1.5; }
+  h1, h2 { text-shadow: 0 2px 12px rgba(0,0,0,.6); }
+
+  /* 表示された時にふわっと出るアニメーション */
+  .slide.active h1,
+  .slide.active h2 { animation: pop 1s .3s both; }
+  @keyframes pop {
+    from { opacity: 0; transform: translateY(40px) scale(.9); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+  }
+
+  /* 操作UI */
+  .dots { position: fixed; bottom: 4vh; left: 50%; transform: translateX(-50%); display: flex; gap: 12px; z-index: 10; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; background: rgba(255,255,255,.4); cursor: pointer; transition: .3s; }
+  .dot.active { background: #fff; transform: scale(1.4); }
+  .hint { position: fixed; right: 3vw; bottom: 4vh; font-size: 14px; opacity: .7; z-index: 10; }
+</style>
+</head>
+<body>
+
+<section class="slide active" id="s1">
+  <h1>Yohゼミの活動報告</h1>
+</section>
+
+<section class="slide" id="s2">
+  <h2>前期は俺たちの<br>青春マップを作った</h2>
+</section>
+
+<section class="slide" id="s3">
+  <h2>後期は災害時緊急アプリを<br>つくります!</h2>
+</section>
+
+<div class="dots"></div>
+<div class="hint">クリック / ← → キーで切り替え</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsBox = document.querySelector('.dots');
+  let current = 0;
+
+  // ドットを作る
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.onclick = () => go(i);
+    dotsBox.appendChild(d);
+  });
+  const dots = document.querySelectorAll('.dot');
+
+  function go(n) {
+    current = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach((s, i) => {
+      s.classList.toggle('active', i === current);
+      s.classList.toggle('prev', i < current);
+    });
+    dots.forEach((d, i) => d.classList.toggle('active', i === current));
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight') go(current + 1);
+    if (e.key === 'ArrowLeft')  go(current - 1);
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.classList.contains('dot')) go(current + 1);
+  });
+
+  go(0);
+</script>
+</body>
+</html>
